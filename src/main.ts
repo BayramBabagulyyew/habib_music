@@ -3,6 +3,7 @@ import { IEnvironment } from '@common/interfaces';
 import { SwaggerConfig } from '@config';
 import { Seeder } from '@db/seeders/superAdmin.seeder';
 import compression from '@fastify/compress';
+import fastifyMultipart from '@fastify/multipart';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -12,11 +13,11 @@ import {
 } from '@nestjs/platform-fastify';
 import { useContainer } from 'class-validator';
 import * as express from 'express';
-import { contentParser } from 'fastify-multer';
 import { I18nValidationExceptionFilter } from 'nestjs-i18n';
 import { join } from 'path';
 import 'reflect-metadata';
 import { AppModule } from './app.module';
+
 async function music() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
@@ -26,7 +27,7 @@ async function music() {
     },
   );
   const config: ConfigService = app.get(ConfigService);
-
+  await app.register(fastifyMultipart);
   const globalApiPrefix =
     config.get<IEnvironment['API_PREFIX']>('API_PREFIX') ?? 'api';
   const appVersion =
@@ -86,7 +87,6 @@ async function music() {
   //   },
   // });
 
-  app.register(contentParser);
 
   app.use('/static', express.static(join(__dirname, '..', 'public/static/')));
 

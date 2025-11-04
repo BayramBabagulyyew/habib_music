@@ -7,7 +7,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { SkipAuth } from '../decorators';
-import { LoginDto, RegisterDto } from '../dtos/auth-credentials-request.dto';
+import { LoginDto } from '../dtos/auth-credentials-request.dto';
 import { ForgotPasswordDto } from '../dtos/forgot-password.dto';
 import { RefreshTokenDto } from '../dtos/validate-token-request.dto';
 import { AuthService, TokenService } from '../services';
@@ -32,25 +32,6 @@ export class AuthController {
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
-
-  @ApiOperation({ description: 'User registration' })
-  @ApiOkResponse({ description: 'Successfully registered user' })
-  @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @SkipAuth()
-  @Post('register')
-  register(@Body() dto: RegisterDto) {
-    return this.authService.register(dto);
-  }
-
-
-  @ApiOperation({ description: 'Admin login authentication' })
-  @SkipAuth()
-  @Post('admin-login')
-  adminLogin(@Body() dto: LoginDto) {
-    return this.authService.adminLogin(dto);
-  }
-
 
   @ApiOperation({ description: 'Renew access in the application' })
   @ApiOkResponse({ description: 'token successfully renewed' })

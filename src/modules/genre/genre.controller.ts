@@ -1,9 +1,12 @@
 import { PaginationDto } from '@common/global-dto';
 import { PaginationParams, type PaginationRequest } from '@common/libs/pagination';
+import { SkipAuth, TOKEN_NAME } from '@modules/auth';
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { GenreService } from './genre.service';
 
+@ApiBearerAuth(TOKEN_NAME)
 @Controller('genre')
 export class GenreController {
   constructor(private readonly genreService: GenreService) { }
@@ -13,6 +16,7 @@ export class GenreController {
     return this.genreService.create(createGenreDto);
   }
 
+  @SkipAuth()
   @Get()
   findAll(
     @PaginationParams() pagination: PaginationRequest<PaginationDto>,
@@ -21,6 +25,7 @@ export class GenreController {
     return this.genreService.findAll(pagination, query);
   }
 
+  @SkipAuth()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.genreService.findOne(+id);

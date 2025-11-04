@@ -1,30 +1,45 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { TOKEN_NAME } from '@common/constants';
+import { editFileName, fileFilter } from '@modules/files/utils';
+import { Body, Controller, Delete, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import { diskStorage } from 'fastify-multer';
+import { existsSync, mkdirSync } from 'fs';
+import { CreateFilesDto } from './dto/create-file.dto';
+import { MulterFile } from './file.mapper';
 import { FilesService } from './files.service';
-import { CreateFileDto } from './dto/create-file.dto';
-import { UpdateFileDto } from './dto/update-file.dto';
+import { FastifyFilesInterceptor } from './interceptor/fastify-files-interceptor';
 
+@ApiBearerAuth(TOKEN_NAME)
 @Controller('files')
 export class FilesController {
-  constructor(private readonly filesService: FilesService) {}
+  constructor(private readonly filesService: FilesService) { }
 
   @Post()
-  create(@Body() createFileDto: CreateFileDto) {
-    return this.filesService.create(createFileDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.filesService.findAll();
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FastifyFilesInterceptor('file', 15, {
+      storage: diskStorage({
+        destination: (req, file, cb) => {
+          const directory = `./uploads`;
+          if (!existsSync(directory)) {
+            mkdirSync(directory, { recursive: true });
+          }
+          cb(null, directory);
+        },
+        filename: editFileName as any,
+      }),
+      fileFilter: fileFilter,
+    }),
+  )
+  @Post()
+  create(@Body() createFileDto: CreateFilesDto,
+    @UploadedFiles() files: MulterFile[],) {
+    return this.filesService.create(createFileDto, files);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.filesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFileDto: UpdateFileDto) {
-    return this.filesService.update(+id, updateFileDto);
   }
 
   @Delete(':id')

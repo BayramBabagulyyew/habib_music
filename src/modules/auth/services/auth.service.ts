@@ -89,7 +89,7 @@ export class AuthService {
       email: user.dataValues.email,
       isSuper: user.dataValues.isSuper,
     };
-    console.log('payload', payload);
+
     const waitingToken: Promise<TokenDto> =
       this.tokenService.generateAuthToken(payload);
 

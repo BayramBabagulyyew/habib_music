@@ -1,9 +1,13 @@
+import { TOKEN_NAME } from '@common/constants';
 import { PaginationDto } from '@common/global-dto';
 import { PaginationParams, type PaginationRequest } from '@common/libs/pagination';
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 
+
+@ApiBearerAuth(TOKEN_NAME)
 @Controller('album')
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) { }

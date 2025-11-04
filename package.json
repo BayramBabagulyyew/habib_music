@@ -1,5 +1,5 @@
 {
-  "name": "marify",
+  "name": "habib_music",
   "version": "1.0.0",
   "description": "",
   "author": "Bayram Babagulyyew",
@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@fastify/compress": "^8.1.0",
+    "@fastify/multipart": "^9.3.0",
     "@fastify/static": "^8.2.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
