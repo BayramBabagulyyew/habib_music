@@ -101,6 +101,14 @@ export class MediaService {
           { model: FileModel, as: 'audio' },
         ],
       },
+      {
+        model: VideoModel,
+        as: 'video',
+        include: [
+          { model: FileModel, as: 'thumbnail' },
+          { model: FileModel, as: 'video' },
+        ],
+      },
       { model: GenreModel, as: 'genres' },
     ];
 
@@ -124,6 +132,125 @@ export class MediaService {
 
     return Pagination.of<QueryMediaDto, MediaModel>(pagination, count, rows);
   }
+
+
+  async findAllVideos(
+    pagination: PaginationRequest<QueryMediaDto>,
+    query: QueryMediaDto,
+    lang: Lang,
+    user?: JwtPayload,
+  ) {
+    const { limit, skip, orderBy, orderDirection } = pagination;
+    const where: WhereOptions<VideoModel> = {};
+    const whereMedia: WhereOptions<MediaModel> = {};
+
+    if (query.search) {
+      whereMedia[Op.or] = [
+        { nameTk: { [Op.iLike]: `%${query.search}%` } },
+        { nameEn: { [Op.iLike]: `%${query.search}%` } },
+        { nameRu: { [Op.iLike]: `%${query.search}%` } },
+      ];
+    }
+
+    if (query.albumId) {
+      whereMedia.albumId = query.albumId;
+    }
+
+    // If a genre filter is requested, add it as a nested include on the media association
+    const include: any[] = [
+      { model: FileModel, as: 'thumbnail' },
+      { model: FileModel, as: 'video' },
+    ];
+
+    const mediaInclude: any = {
+      model: MediaModel,
+      as: 'media',
+      where: whereMedia,
+      include: [],
+    };
+
+    if (query.genreId) {
+      mediaInclude.include.push({
+        model: GenreModel,
+        as: 'genres',
+        where: { id: query.genreId },
+        required: true,
+      });
+    }
+
+    include.push(mediaInclude);
+
+    const { rows, count } = await this.video.findAndCountAll({
+      where: where,
+      limit: limit,
+      offset: skip,
+      order: [[orderBy, orderDirection]],
+      include: include,
+      distinct: true,
+    });
+
+    return Pagination.of<QueryMediaDto, VideoModel>(pagination, count, rows);
+  }
+
+  async findAllAudios(
+    pagination: PaginationRequest<QueryMediaDto>,
+    query: QueryMediaDto,
+    lang: Lang,
+    user?: JwtPayload,
+  ) {
+    const { limit, skip, orderBy, orderDirection } = pagination;
+    const where: WhereOptions<AudioModel> = {};
+    const whereMedia: WhereOptions<MediaModel> = {};
+
+    if (query.search) {
+      whereMedia[Op.or] = [
+        { nameTk: { [Op.iLike]: `%${query.search}%` } },
+        { nameEn: { [Op.iLike]: `%${query.search}%` } },
+        { nameRu: { [Op.iLike]: `%${query.search}%` } },
+      ];
+    }
+
+    if (query.albumId) {
+      whereMedia.albumId = query.albumId;
+    }
+
+    // If a genre filter is requested, add it as a nested include on the media association
+    const include: any[] = [
+      { model: FileModel, as: 'thumbnail' },
+      { model: FileModel, as: 'audio' },
+    ];
+
+    const mediaInclude: any = {
+      model: MediaModel,
+      as: 'media',
+      where: whereMedia,
+      include: [],
+    };
+
+    if (query.genreId) {
+      mediaInclude.include.push({
+        model: GenreModel,
+        as: 'genres',
+        where: { id: query.genreId },
+        required: true,
+      });
+    }
+
+    include.push(mediaInclude);
+
+    const { rows, count } = await this.audio.findAndCountAll({
+      where: where,
+      limit: limit,
+      offset: skip,
+      order: [[orderBy, orderDirection]],
+      include: include,
+      distinct: true,
+    });
+
+    return Pagination.of<QueryMediaDto, AudioModel>(pagination, count, rows);
+  }
+
+
 
   async findOne(id: number, lang: Lang) {
     const media = await this.media.findByPk(id, {

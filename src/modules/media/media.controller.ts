@@ -41,6 +41,28 @@ export class MediaController {
   }
 
   @SkipAuth()
+  @Get('videos')
+  findVideos(
+    @PaginationParams() pagination: PaginationRequest<QueryMediaDto>,
+    @Query() query: QueryMediaDto,
+    @Headers('lang') lang: Lang,
+    @CurrentUser() user?: JwtPayload,
+  ) {
+    return this.mediaService.findAllVideos(pagination, query, lang, user);
+  }
+
+  @SkipAuth()
+  @Get('audios')
+  findAudios(
+    @PaginationParams() pagination: PaginationRequest<QueryMediaDto>,
+    @Query() query: QueryMediaDto,
+    @Headers('lang') lang: Lang,
+    @CurrentUser() user?: JwtPayload,
+  ) {
+    return this.mediaService.findAllAudios(pagination, query, lang, user);
+  }
+
+  @SkipAuth()
   @Get(':id')
   findOne(
     @Param('id') id: string,

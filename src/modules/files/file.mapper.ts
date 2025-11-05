@@ -43,14 +43,14 @@ export class ImageMapper {
     return dto;
   }
 
-  public static toDataBase(dto: CreateFilesDto, files: MulterFile[]) {
-    const mappedFiles: CreateFilesDto[] = files.map((file) => {
+  public static async toDataBase(dto: CreateFilesDto, files: MulterFile[]) {
+    const mappedFiles: CreateFilesDto[] = await Promise.all(files.map(async (file) => {
       return {
         file: file.path,
         fileType: FileHelper.getFileType(file.mimetype),
-        duration: FileHelper.getFileType(file.mimetype) != FileTypeEnum.PHOTO ? VideoHelper.getVideoDuration(file.path) : null,
+        duration: FileHelper.getFileType(file.mimetype) != FileTypeEnum.PHOTO ? await VideoHelper.getVideoDuration(file.path) : null,
       } as unknown as CreateFilesDto
-    })
+    }));
     return mappedFiles;
   }
 }

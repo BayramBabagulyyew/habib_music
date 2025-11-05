@@ -12,6 +12,7 @@ import { AlbumModel } from './album.model';
 import { AudioModel } from './audio.model';
 import { GenreMediaModel } from './genre-media.model';
 import { GenreModel } from './genre.model';
+import { VideoModel } from './videos.model';
 
 @Table({ tableName: 'medias' })
 export class MediaModel extends Model<MediaModel> {
@@ -43,6 +44,9 @@ export class MediaModel extends Model<MediaModel> {
 
   @HasOne(() => AudioModel)
   audio: AudioModel;
+
+  @HasOne(() => VideoModel)
+  video: VideoModel;
 
   @BelongsToMany(() => GenreModel, () => GenreMediaModel)
   genres: GenreModel[];

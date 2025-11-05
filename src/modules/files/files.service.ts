@@ -12,9 +12,16 @@ export class FilesService {
   ) { }
 
   async create(dto: CreateFilesDto, files: MulterFile[]) {
-    const mappedData: CreateFilesDto[] = ImageMapper.toDataBase(dto, files);
-    const createFileDto = await this.file.bulkCreate(mappedData as any);
-    return createFileDto
+    try {
+
+      const mappedData: CreateFilesDto[] = await ImageMapper.toDataBase(dto, files);
+      const createFileDto = await this.file.bulkCreate(mappedData as any);
+      return createFileDto
+    }
+    catch (error) {
+      files.map(file => FileHelper.deleteFileSilent(file.path));
+      throw error;
+    }
   }
 
 
