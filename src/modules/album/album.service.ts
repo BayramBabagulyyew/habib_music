@@ -23,7 +23,7 @@ export class AlbumService {
     const { limit, skip, page, orderBy, orderDirection } = pagination;
     const where: WhereOptions<AlbumModel> = {};
     if (query.search) {
-      where[Op.or] = [{ title_tk: { [Op.iLike]: `%${query.search}%` } }];
+      where[Op.or] = [{ nameTk: { [Op.iLike]: `%${query.search}%` } }];
     }
 
     const { rows, count } = await this.albumModel.findAndCountAll({
