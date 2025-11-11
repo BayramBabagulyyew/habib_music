@@ -300,6 +300,9 @@ export class MediaService {
           thumbnailId: dto.thumbnailId ? audioRecord.thumbnailId : audioRecord.thumbnailId,
         });
       }
+    } if (dto.audioId === null) {
+      // If audioId is explicitly set to null, remove the audio record
+      await this.audio.destroy({ where: { mediaId: id } });
     }
 
     // Update video if provided
@@ -311,6 +314,9 @@ export class MediaService {
           thumbnailId: dto.thumbnailId ? videoRecord.thumbnailId : videoRecord.thumbnailId,
         });
       }
+    } else if (dto.videoId === null) {
+      // If videoId is explicitly set to null, remove the video record
+      await this.video.destroy({ where: { mediaId: id } });
     }
 
     // Update genres if provided
